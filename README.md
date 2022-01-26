@@ -18,10 +18,16 @@
 
 <img src="img/image-20220126195226495.png" alt="image-20220126195226495" style="zoom:80%;" />
 
-可以直接使用Navicat等可视化工具新建查询，然后运行如下sql命令运行题库：
+可以直接使用Navicat等可视化工具新建查询，然后运行如下sql命令增加题目（注意字符串最好不要换行，会引入`\n`、`\t`啥的）：
 
 ```mysql
-INSERT INTO `question_bank` (`type`, `description`, `option`, `answer`, `explanation`) VALUES (....);
+INSERT INTO question_bank (`type`, `description`, `option`, `answer`, `explanation`)
+		VALUES ("单选",
+				"关关雎鸠，在河之洲。窈窕淑女，君子好逑。参差荇菜，_______。窈窕淑女，________。",
+				"A 左右采之；琴瑟友之 \n B 左右流之；寤寐求之 \n C 左右采之；寤寐求之 \n D 左右流之；求之不得",
+			    "C",
+				"略"
+			);
 ```
 
 ### 功能实现
