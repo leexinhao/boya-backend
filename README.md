@@ -10,7 +10,7 @@
 |    字段     |       数据类型        |                       描述                       |
 | :---------: | :-------------------: | :----------------------------------------------: |
 |     id      | int unsigned NOT NULL |                   自增逻辑主键                   |
-|    type     | varchar(20) NOT NULL  |        题目类型（单选、多选、填空、简答）        |
+|    type     | varchar(20) NOT NULL  |        题目类型，题型加主题（单选_xxx、多选_xxx、填空_xxx、简答_xxx）        |
 | description | varchar(255) NOT NULL |                       题干                       |
 |   option    |     varchar(255)      | 题目选项（题目为选择题的情况下有效），以换行分隔 |
 |   answer    | varchar(255) NOT NULL |         题目答案，若有多个答案以换行分隔         |
@@ -22,7 +22,7 @@
 
 ```mysql
 INSERT INTO question_bank (`type`, `description`, `option`, `answer`, `explanation`)
-		VALUES ("单选",
+		VALUES ("单选_诗句填空",
 				"关关雎鸠，在河之洲。窈窕淑女，君子好逑。参差荇菜，_______。窈窕淑女，________。",
 				"A 左右采之；琴瑟友之 \n B 左右流之；寤寐求之 \n C 左右采之；寤寐求之 \n D 左右流之；求之不得",
 			    "C",
