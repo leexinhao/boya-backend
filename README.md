@@ -17,13 +17,14 @@
 |   answer    | varchar(255) NOT NULL |         题目答案，若有多个答案以换行分隔         |
 | explanation |     varchar(255)      |                     答案解析                     |
 
-<img src="img/image-20220126195226495.png" alt="image-20220126195226495" style="zoom:80%;" />
+
 
 可以直接使用Navicat等可视化工具新建查询，然后运行如下sql命令增加题目（注意字符串最好不要换行，会引入`\n`、`\t`啥的）：
 
 ```mysql
-INSERT INTO question_bank (`type`, `description`, `option`, `answer`, `explanation`)
-		VALUES ("单选_诗句填空",
+INSERT INTO question_bank (`type`, `theme`, `description`, `option`, `answer`, `explanation`)
+		VALUES ("单选",
+				"诗句填空",
 				"关关雎鸠，在河之洲。窈窕淑女，君子好逑。参差荇菜，_______。窈窕淑女，________。",
 				"A 左右采之；琴瑟友之 \n B 左右流之；寤寐求之 \n C 左右采之；寤寐求之 \n D 左右流之；求之不得",
 			    "C",
