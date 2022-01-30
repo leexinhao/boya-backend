@@ -10,7 +10,8 @@
 |    字段     |       数据类型        |                       描述                       |
 | :---------: | :-------------------: | :----------------------------------------------: |
 |     id      | int unsigned NOT NULL |                   自增逻辑主键                   |
-|    type     | varchar(20) NOT NULL  |        题目类型，题型加主题（单选_xxx、多选_xxx、填空_xxx、简答_xxx）        |
+|    type     | varchar(10) NOT NULL  |        题目类型（单选、多选、填空、简答）        |
+|    theme     | varchar(10) NOT NULL  |        题目主题        |
 | description | varchar(255) NOT NULL |                       题干                       |
 |   option    |     varchar(255)      | 题目选项（题目为选择题的情况下有效），以换行分隔 |
 |   answer    | varchar(255) NOT NULL |         题目答案，若有多个答案以换行分隔         |
