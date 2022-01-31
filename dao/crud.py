@@ -3,7 +3,7 @@
 
 from pymysql.converters import escape_string
 from typing import Optional, List, Dict, Union
-from dao.utils import kv_to_where, kv_to_update_set, open_database
+from dao.utils import kv_to_where, kv_to_update_set, open_database,split_options
 
 
 def insert_items(table_name: str,
@@ -127,7 +127,7 @@ def select_items(table_name: str,
         raise e
     finally:
         connection.close()
-    return list(results)
+    return split_options(list(results)) #分割选项
 
 
 def update_items(table_name: str,
