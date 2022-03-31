@@ -5,7 +5,7 @@
 博雅学院老师的项目的后端，采用mysql+FastAPI。
 # 1 首页
 
-<img src="img/image-20220331091935329.png" alt="image-20220331091935329" style="zoom: 15%;" /><img src="img/image-20220331092120937.png" alt="image-20220331092120937" style="zoom:15%;" />
+<img src="img/image-20220331091935329.png" alt="image-20220331091935329" style="zoom:100%;" /><img src="img/image-20220331092120937.png" alt="image-20220331092120937" style="zoom:100%;" />
 
 ## 1.1 发送用户数据
 
@@ -26,7 +26,7 @@
 # 2 诗情画意（诗经百科）
 
 ## 2.1 诗歌的展示
-<img src="img/image-20220331092223984.png" alt="image-20220331092223984" style="zoom:15%;" /><img src="img/fengyasong.jpg" alt="img" style="zoom:15%;" />
+<img src="img/image-20220331092223984.png" alt="image-20220331092223984" style="zoom:100%;" /><img src="img/fengyasong.jpg" alt="img" style="zoom:100%;" />
 
 ### 2.1.1 数据库设计
 
@@ -57,7 +57,7 @@
 ```
 ## 2.2 配图的展示
 
-<img src="img/duck_picture.jpg" alt="img" style="zoom:15%;" /><img src="img/image-20220331093323826.png" alt="image-20220331093323826" style="zoom:15%;" />
+<img src="img/duck_picture.jpg" alt="img" style="zoom:100%;" /><img src="img/image-20220331093323826.png" alt="image-20220331093323826" style="zoom:100%;" />
 
 
 ### 2.2.1 数据库设计
@@ -86,11 +86,11 @@
 
 # 2 渐入佳境（单机，无飞花令）
 
-<img src="img/image-20220331094906735.png" alt="image-20220331094906735" style="zoom:15%;" />
+<img src="img/image-20220331094906735.png" alt="image-20220331094906735" style="zoom:100%;" />
 
 ## 2.1 文海磨砺（诗经题库）
 
-<img src="img/image-20220331095112762.png" alt="image-20220331095112762" style="zoom:15%;" />
+<img src="img/image-20220331095112762.png" alt="image-20220331095112762" style="zoom:100%;" />
 
 ### 2.1.1 数据库设计
 
@@ -136,7 +136,7 @@ INSERT INTO question_bank (`type`, `theme`, `description`, `option`, `answer`, `
 
 ## 2.2 补字成诗（生僻字）
 
-<img src="img/image-20220331095035069.png" alt="image-20220331095035069" style="zoom:15%;" />
+<img src="img/image-20220331095035069.png" alt="image-20220331095035069" style="zoom:100%;" />
 
 ### 2.2.1 数据库设计
 
@@ -162,7 +162,7 @@ INSERT INTO question_bank (`type`, `theme`, `description`, `option`, `answer`, `
 
 ## 3.1 对战匹配
 
-<img src="img/image-20220331095232518.png" alt="image-20220331095232518" style="zoom:15%;" />
+<img src="img/image-20220331095232518.png" alt="image-20220331095232518" style="zoom:100%;" />
 
 ### 3.1.1 数据库设计
 
@@ -184,7 +184,7 @@ pk创建房间 websocket
 
 ## 3.2 飞花令
 
-<img src="img/image-20220331095211307.png" alt="image-20220331095211307" style="zoom:15%;" />
+<img src="img/image-20220331095211307.png" alt="image-20220331095211307" style="zoom:100%;" />
 
 ### 3.2.1 数据库设计
 
