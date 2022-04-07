@@ -14,11 +14,12 @@
 ### 1.1.1 数据库设计
 
 表名为`user`，存放用户相关信息：
-|   字段   |        数据类型         |       描述       |
-| :------: | :---------------------: | :--------------: |
-|   `id`   | `int unsigned NOT NULL` |   自增逻辑主键   |
-| `openid` | `varchar(50) NOT NULL`  | 微信用户的唯一id |
-| `uname`  | `varchar(40) NOT NULL`  |     微信昵称     |
+|     字段     |        数据类型         |       描述       |
+| :----------: | :---------------------: | :--------------: |
+|     `id`     | `int unsigned NOT NULL` |   自增逻辑主键   |
+|   `openid`   | `varchar(50) NOT NULL`  | 微信用户的唯一id |
+|   `uname`    | `varchar(40) NOT NULL`  |     微信昵称     |
+| `avator_url` |     `varchar(255)`      |     微信头像     |
 
 可以直接使用Navicat等可视化工具新建查询，然后运行如下sql命令增加题目（注意字符串最好不要换行，会引入`\n`、`\t`啥的）。
 
