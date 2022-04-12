@@ -3,7 +3,7 @@
 
 import uvicorn
 from fastapi import FastAPI
-from api import question_api
+from api import question_api,user_api,poem_api,picture_api,question_padding_api,pk_api
 from starlette.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -25,6 +25,11 @@ app.add_middleware(
 
 # 注册api模块
 app.include_router(question_api.router, prefix='/api')
+app.include_router(user_api.router, prefix='/api')
+app.include_router(poem_api.router, prefix='/api')
+app.include_router(picture_api.router, prefix='/api')
+app.include_router(question_padding_api.router, prefix='/api')
+app.include_router(pk_api.router, prefix='/api')
 
 # 配置容器启动相应的实例
 if __name__ == '__main__':

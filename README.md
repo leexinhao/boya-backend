@@ -23,10 +23,12 @@
 
 可以直接使用Navicat等可视化工具新建查询，然后运行如下sql命令增加题目（注意字符串最好不要换行，会引入`\n`、`\t`啥的）。
 
-### 1.1.2 ==后端API实现==
+### 1.1.2 后端API实现
 
 - 登录，`POST`
   
+    若用户不存在则新建，否则更新用户信息
+    
     - `input`：
     
         ```json
@@ -74,7 +76,9 @@ INSERT INTO poem (`poem_id`, `title`, `content`, `explanation`, `annotation`, `p
 			);
 ```
 
-### 2.1.2 ==后端API实现==
+另外还有两个音频的url，分别对应诗歌的朗诵音频和赏析音频，暂且存在本机服务器上，后端根据poem_id构造。
+
+### 2.1.2 后端API实现
 
 - 返回所有诗歌的题目和id，`GET`
   
@@ -95,7 +99,7 @@ INSERT INTO poem (`poem_id`, `title`, `content`, `explanation`, `annotation`, `p
     		},
     		...
     	]
-    	"ye":[
+    	"ya":[
     		{
     			poem_id: 2,
     			title: "yyyy"
@@ -129,7 +133,8 @@ INSERT INTO poem (`poem_id`, `title`, `content`, `explanation`, `annotation`, `p
     	explanation: "sdasdad",
     	annotation: "sadsad",
     	picture_id: 11,
-        audio_url: "www.xxx.com"
+        recite_url: "www.xxx.com",
+        appreciation_url:"www.xxx.com"
     }
     ```
 
@@ -161,7 +166,7 @@ INSERT INTO picture (`picture_id`, `title`, `abstract`, `annotation`)
 			);
 ```
 
-### 2.2.2 ==后端API实现==
+### 2.2.2 后端API实现
 
 - 给定图片id，返回简略信息，`GET`
   
@@ -178,7 +183,7 @@ INSERT INTO picture (`picture_id`, `title`, `abstract`, `annotation`)
           title: "xxx",
     	    abstract: "xxx" ,
     		picture_url: "xxx",
-    		pinying_url: "xxx"
+    		pinyin_url: "xxx"
     	}
     	```
     
@@ -248,7 +253,7 @@ INSERT INTO question_bank (`type`, `theme`, `description`, `option`, `answer`, `
 - `get-all`：返回所有题目的信息（包括诗歌内容等关于问题的所有信息）
 - `get/{id}`：根据题目id来返回对应的题目。
 
-考虑加一个：
+又加了一个：
 
 - `get-all-id`：返回所有题目的id，因为`get-all`可能返回的内容太多了。
 
@@ -300,7 +305,7 @@ INSERT INTO question_bank (`type`, `theme`, `description`, `option`, `answer`, `
     }
     ```
 
-- 给定图片base4，返回识别结果，`POST`
+- 给定图片utf-8编码的base64编码，==返回识别结果==，`POST`
   - `input`：
 
     ```json
@@ -331,9 +336,9 @@ INSERT INTO question_bank (`type`, `theme`, `description`, `option`, `answer`, `
 
 现在可以直接开个字典，之后可能要换nosql
 
-### 4.1.2 ==后端API实现==
+### 4.1.2 后端API实现
 
-- 创建密令，`POST` or `GET`？
+- 创建六位密令， `GET`
 
   - `input`：
 
@@ -344,10 +349,10 @@ INSERT INTO question_bank (`type`, `theme`, `description`, `option`, `answer`, `
   - `output`:
 
     ```json
-    token: "xxxxx"
+    token: "xxxxxx"
     ```
 
-- 使用密令进入房间（双方都要用），`POST`
+- 使用密令进入房间（双方都要用），`ws`
 
   - `input`：
 
@@ -358,12 +363,12 @@ INSERT INTO question_bank (`type`, `theme`, `description`, `option`, `answer`, `
   
   - `output`:
   
+    长连接，当后端检测到两个用户均进入到房间时广播用户信息
+    
     ```json
     {
         unames: ["xxxx", "xxxx"],
-     	avator_url: ["www.xxx", "www.xxx"],
-        session_id: 123,
-        question: "x"
+     	avator_url: ["www.xxx", "www.xxx"]
     }
     ```
 
@@ -379,24 +384,25 @@ INSERT INTO question_bank (`type`, `theme`, `description`, `option`, `answer`, `
 
 ### 4.2.2 ==后端API实现==
 
-- 验证答案是否正确，`POST`
+- 在``对战匹配`的长连接里`验证答案是否正确`，
 
-  - `input`：
+  - 前端在长连接里发送信息：
 
     ```json
     {
         openid: "xxxxx",
-        session_id: 123, // 后端使用这个查找对应房间的题目并验证
-        answer: str
+        token: 123, // 后端使用这个查找对应房间的题目并验证
+        answer: str，//这个应该是音频？
     }
     ```
 
-  - `output`：
+  - 后端在长连接里判断后返回：
 
     ```json
     {
-        isright: True
+        isright: True，
+        text:"xxx",//音频转的文字
     }
     ```
-
+    
     
