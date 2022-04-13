@@ -52,11 +52,11 @@ async def get_question(id: int,
     return jsonable_encoder(result)
 
 @router.post("/get-recognition-result",responses={400: {"model": Code400}})
-async def recog_img(file: bytes = File(...)):
+async def recog_img(imgstr: str):
     """
         获取图片文字的识别信息
     """
     # 解码过程
-    img_file = base64.b64decode(file)
+    
     #TODO 识别图片文字
     return "暂未实现"

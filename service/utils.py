@@ -4,7 +4,7 @@ import random
 
 local_ip = "http://121.36.59.23"
 # local_ip = "http://127.0.0.1"
-port = 8000
+port = 80
 rsc = "/resources"
 
 def get_url(path: str, file_type: str, filename: str) -> str:
