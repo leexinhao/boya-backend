@@ -25,9 +25,21 @@ class ConnectionManager:
     async def connect(self, websocket: WebSocket, token: str, openid: str):
         # 连接
         await websocket.accept()
+        if not (token in manager.active_connections.keys()):
+            await websocket.send_text("无效的token")
+            await websocket.close()
+            return False
+
+        elif len(manager.active_connections[token]) == 2:
+            await websocket.send_text("房间人数已满")
+            await websocket.close()
+            return False
+
         if self.active_connections.get(token,None) is None or len(self.active_connections.get(token,None))==0:
-            self.active_connections[token]={}
+            self.active_connections[token]={}  
+
         self.active_connections[token][openid] = websocket
+        return True
 
     def disconnect(self, token: str, openid: str):
         # 断开连接
@@ -69,13 +81,11 @@ async def generate_token():
 @router.websocket("/ws/{token}/{openid}")
 async def websocket_endpoint(websocket: WebSocket, token: str, openid: str):
     # 1、用户与服务器建立连接
-    await manager.connect(websocket, token, openid)
-    if token not in manager.active_connections.keys():
-        websocket.send_text("无效的token")
-        websocket.close()
-    elif len(manager.active_connections[token]) == 2:
-        websocket.send_text("房间人数已满")
-        websocket.close()
+    print("connect",token, openid)
+    r = await manager.connect(websocket, token, openid)
+    if not r:
+        return
+
     # TODO 对战实现
 
     # 2、广播某个用户进入了房间
@@ -89,32 +99,36 @@ async def websocket_endpoint(websocket: WebSocket, token: str, openid: str):
                 flag = True
                 user1_info=user_service.get_userInfo(openid)
                 
-                ids = manager.active_connections[token].keys()
+                ids = list(manager.active_connections[token].keys())
                 if openid==ids[0]:
                     another_id=ids[1]
                 else:
                     another_id=ids[0]
                 
                 user2_info=user_service.get_userInfo(another_id)
-                user_info = {"uname":[user1_info["name"],user2_info['name']],\
+                user_info = {"uname":[user1_info["uname"],user2_info['uname']],\
                     "avator_url":[user1_info["avator_url"],user2_info["avator_url"]]}
 
-                manager.broadcast(user_info,token,"json")
+                await manager.broadcast("ok",token)
+                await manager.broadcast(user_info,token,"json")
 
                 ##4、发送题目信息
-                manager.broadcast("水",token)
+                await manager.broadcast("水",token)
 
             # 5、服务器接受客户消息
             ## FIXME 或许是接受json?
             data = await websocket.receive_text()
 
             #TODO 6、判断答案是否正确
-            # isright=
-
-            # TODO 7、音频转文字以及根据正确性与否发送消息
-            await manager.broadcast(f"{openid} 发送信息：{data}")
+            isright= '水' in data
+            if isright:
+                # TODO 7、音频转文字以及根据正确性与否发送消息
+                await manager.broadcast(f"{openid} 发送信息：{data}",token)
+            else:
+                await manager.send_personal_message("回答错误",websocket)
 
     except WebSocketDisconnect:
         # 5、客户断开联系，进行广播
+        print("duanle", token, openid)
         manager.disconnect(token, openid)
         await manager.broadcast(f"{openid} 离开了房间",token)
