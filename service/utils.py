@@ -2,8 +2,8 @@ from typing import List
 import re
 import random
 
-# local_ip = "http://121.36.59.23"
-local_ip = "http://127.0.0.1"
+local_ip = "http://121.36.59.23"
+# local_ip = "http://127.0.0.1"
 port = 8000
 rsc = "/resources"
 

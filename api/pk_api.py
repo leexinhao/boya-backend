@@ -25,9 +25,11 @@ class ConnectionManager:
     async def connect(self, websocket: WebSocket, token: str, openid: str):
         # 连接
         await websocket.accept()
+        if self.active_connections.get(token,None) is None or len(self.active_connections.get(token,None))==0:
+            self.active_connections[token]={}
         self.active_connections[token][openid] = websocket
 
-    def disconnect(self, websocket: WebSocket, token: str, openid: str):
+    def disconnect(self, token: str, openid: str):
         # 断开连接
         del self.active_connections[token][openid]
 
@@ -36,7 +38,7 @@ class ConnectionManager:
 
     async def broadcast(self, message: str, token: str,type="text"):
         # 向指定token的房间发送广播
-        for connection in self.active_connections[token].values:
+        for connection in self.active_connections[token].values():
             if type=="text":
                 await connection.send_text(message)
             else:
@@ -53,7 +55,7 @@ async def generate_token():
         while True:
             result = pk_service.gen_key_service()
             if manager.active_connections.get(result, None) is None:  # 防止生成重复的密令
-                manager.active_connections[result] = []
+                manager.active_connections[result] = {}
                 break
     except HTTPException as e:
         raise e
@@ -64,16 +66,17 @@ async def generate_token():
     return jsonable_encoder({"token":result})
 
 
-@router.websocket("/ws/{token}")
-async def websocket_endpoint(token: str, openid: str, websocket: WebSocket):
+@router.websocket("/ws/{token}/{openid}")
+async def websocket_endpoint(websocket: WebSocket, token: str, openid: str):
     # 1、用户与服务器建立连接
-    if token not in manager.active_connections.keys:
-        return jsonable_encoder("无效的token")
-    elif len(manager.active_connections[token] == 2):
-        return jsonable_encoder("房间人数已满")
-
-    # TODO 对战实现
     await manager.connect(websocket, token, openid)
+    if token not in manager.active_connections.keys():
+        websocket.send_text("无效的token")
+        websocket.close()
+    elif len(manager.active_connections[token]) == 2:
+        websocket.send_text("房间人数已满")
+        websocket.close()
+    # TODO 对战实现
 
     # 2、广播某个用户进入了房间
     await manager.broadcast(f"{openid} 进入了房间", token)
@@ -113,5 +116,5 @@ async def websocket_endpoint(token: str, openid: str, websocket: WebSocket):
 
     except WebSocketDisconnect:
         # 5、客户断开联系，进行广播
-        manager.disconnect(websocket, token, openid)
-        await manager.broadcast(f"{openid} 离开了房间")
+        manager.disconnect(token, openid)
+        await manager.broadcast(f"{openid} 离开了房间",token)
