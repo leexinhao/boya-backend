@@ -7,13 +7,13 @@ local_ip = "http://127.0.0.1"
 port = 8000
 rsc = "/resources"
 
-def get_url(path: str, file_type: str, id: str) -> str:
+def get_url(path: str, file_type: str, filename: str) -> str:
     r"""
     获取资源路径的url
     Example:
     {"path":"/audio/appreciation/", "file_type":"mp3","id":"1"} => "http://121.36.59.23/resources/audio/appreciation/1.mp3"
     """
-    return local_ip+":"+str(port)+rsc+path+id+"."+file_type
+    return local_ip+":"+str(port)+rsc+path+filename+"."+file_type
 
 
 def split_options(result: List[dict]) -> List[dict]:

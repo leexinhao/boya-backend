@@ -31,8 +31,8 @@ def get_poemInfo(poem_id: int, limit: Optional[int], skip: int) -> Dict[str, Uni
     """
     poem_Info=crud.select_items('poem', columns=None,
                                 where={'poem_id': poem_id}, limit=limit, skip=skip)[0]
-    poem_Info['recite_url']=get_url(path="/audio/recite/",file_type="mp3",id=str(poem_id))
-    poem_Info['appreciation_url']=get_url(path="/audio/appreciation/",file_type="mp3",id=str(poem_id))
+    poem_Info['recite_url']=get_url(path="/audio/recite/",file_type="mp3",filename=str(poem_id))
+    poem_Info['appreciation_url']=get_url(path="/audio/appreciation/",file_type="mp3",filename=str(poem_id))
     poem_Info['title']="·".join(poem_Info['title'].split("·")[-1:])
     return poem_Info
 
