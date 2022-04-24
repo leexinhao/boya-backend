@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import json
 import traceback
 from fastapi import APIRouter, Body, Path, Query, HTTPException
 from fastapi import File, WebSocket, WebSocketDisconnect
-from regex import E
+from regex import E, FULLCASE
 from model.code import Code400
 from service import pk_service,user_service
 from fastapi.encoders import jsonable_encoder
@@ -21,6 +22,7 @@ router = APIRouter(
 class ConnectionManager:
     def __init__(self):
         self.active_connections: Dict[str, Dict[str, WebSocket]] = {}
+        self.users_flag={}#记录是否已发送对战双方个人信息
 
     async def connect(self, websocket: WebSocket, token: str, openid: str):
         # 连接
@@ -37,6 +39,7 @@ class ConnectionManager:
 
         if self.active_connections.get(token,None) is None or len(self.active_connections.get(token,None))==0:
             self.active_connections[token]={}  
+            self.users_flag[token]=False
 
         self.active_connections[token][openid] = websocket
         return True
@@ -44,9 +47,13 @@ class ConnectionManager:
     def disconnect(self, token: str, openid: str):
         # 断开连接
         del self.active_connections[token][openid]
+        del self.users_flag[token]
 
-    async def send_personal_message(self, message: str, websocket: WebSocket):
-        await websocket.send_text(message)
+    async def send_personal_message(self, message: str, websocket: WebSocket,type="text"):
+        if type=="text":
+            await websocket.send_text(message)
+        else:
+            await websocket.send_json(message)
 
     async def broadcast(self, message: str, token: str,type="text"):
         # 向指定token的房间发送广播
@@ -68,6 +75,7 @@ async def generate_token():
             result = pk_service.gen_key_service()
             if manager.active_connections.get(result, None) is None:  # 防止生成重复的密令
                 manager.active_connections[result] = {}
+                manager.users_flag[result]=False
                 break
     except HTTPException as e:
         raise e
@@ -90,13 +98,16 @@ async def websocket_endpoint(websocket: WebSocket, token: str, openid: str):
 
     # 2、广播某个用户进入了房间
     await manager.broadcast(f"{openid} 进入了房间", token)
-    flag = False
-
     try:
         while True:
-            if len(manager.active_connections[token]) == 2 and not flag:
+            if len(manager.active_connections[token]) == 2 and (not manager.users_flag[token]):
+                manager.users_flag[token]=True
+                await manager.broadcast("ok",token)
+
+            data = await websocket.receive_text()
+            print("接受信息",data)
+            if str(data)=='1':
                 # TODO 3、返回两个用户的信息
-                flag = True
                 user1_info=user_service.get_userInfo(openid)
                 
                 ids = list(manager.active_connections[token].keys())
@@ -106,26 +117,26 @@ async def websocket_endpoint(websocket: WebSocket, token: str, openid: str):
                     another_id=ids[0]
                 
                 user2_info=user_service.get_userInfo(another_id)
-                user_info = {"uname":[user1_info["uname"],user2_info['uname']],\
+                user_info = {"type":1,\
+                    # "uname":[user1_info["uname"],user2_info['uname']],\
                     "avator_url":[user1_info["avator_url"],user2_info["avator_url"]]}
-
-                await manager.broadcast("ok",token)
+                print('abcd1234')
                 await manager.broadcast(user_info,token,"json")
 
                 ##4、发送题目信息
-                await manager.broadcast("水",token)
+                # await manager.broadcast("水",token)
 
             # 5、服务器接受客户消息
             ## FIXME 或许是接受json?
-            data = await websocket.receive_text()
-
-            #TODO 6、判断答案是否正确
-            isright= '水' in data
-            if isright:
-                # TODO 7、音频转文字以及根据正确性与否发送消息
-                await manager.broadcast(f"{openid} 发送信息：{data}",token)
-            else:
-                await manager.send_personal_message("回答错误",websocket)
+            if data!='1':
+                #TODO 6、判断答案是否正确
+                print(data)
+                isright= '水' in data
+                if isright:
+                    # TODO 7、音频转文字以及根据正确性与否发送消息
+                    await manager.broadcast({"type":2,"data":data},token,"json")
+                else:
+                    await manager.send_personal_message({"type":3,"data":"回答错误"},websocket,"json")
 
     except WebSocketDisconnect:
         # 5、客户断开联系，进行广播
