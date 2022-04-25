@@ -138,6 +138,28 @@ INSERT INTO poem (`poem_id`, `title`, `content`, `explanation`, `annotation`, `p
     }
     ```
 
+- 给定关键词 `keyword`，返回模糊搜索匹配，`GET`：
+
+  - `input`：
+
+    ```json
+    keyword:"雎"
+    ```
+
+  - `output`：
+
+    ```json
+    [{
+        poem_id:1
+       	title:"<span>关</span><strong style='color:#C85249'>雎</strong>"
+        abstract:"<span>关关</span<strong style='color:#C85249'>雎</strong><span>鸠，在河之洲</span>"
+    }
+    ...
+    ]
+    ```
+
+    
+
 ## 2.2 配图的展示
 
 <img src="img/duck_picture.jpg" alt="img" style="zoom:100%;" /><img src="img/image-20220331093323826.png" alt="image-20220331093323826" style="zoom:100%;" />
@@ -197,6 +219,76 @@ INSERT INTO picture (`picture_id`, `title`, `abstract`, `annotation`)
     
   - `output`:
     
+    ```json
+    {
+        title: "xxx"
+        abstract: "xxx" 
+        annotation: "xxx" 
+    	picture_url: "xxx"
+    	pinying_url: "xxx"
+    }
+    ```
+
+<div STYLE="page-break-after: always;"></div>
+
+## 2.3 图片百科
+
+<img src="img/image-20220421190238429.png" alt="image-20220421190238429" style="zoom:80%;" />
+
+### 2.3.1 数据库设计
+
+表名为`picture`，存放图片相关信息（和上面分开是因为不是所有诗歌都会有图片）：
+
+|     字段     |        数据类型         |       描述       |
+| :----------: | :---------------------: | :--------------: |
+|     `id`     | `int unsigned NOT NULL` |   自增逻辑主键   |
+| `picture_id` |     `int unsigned`      |     图片的id     |
+|   `title`    | `varchar(40) NOT NULL`  | 诗歌名称，即出处 |
+|  `abstract`  |     `varchar(100)`      |     原文摘要     |
+| `annotation` |     `varchar(1000)`     |       图解       |
+
+可以直接使用Navicat等可视化工具新建查询，然后运行如下sql命令增加题目（注意字符串最好不要换行，会引入`\n`、`\t`啥的）：
+
+```mysql
+INSERT INTO picture (`picture_id`, `title`, `abstract`, `annotation`)
+		VALUES (1,
+				"国风·周南·关雎",	
+                "关关雎鸠，在河之洲",
+				'雎鸠究竟为何种鸟，历来说法不一。从诗篇用"关关"形容它们的叫声推测，应当为扁嘴类的鸟，即食鱼的水鸟。同时，"雎鸠"还是随着季节变化迁徙的候鸟。北方常见的候鸟是凫雁一类，所以古代文学中对雁的表现也特别多，其中绿头雁最常见。当这样的双飞双宿的鸟儿在河洲上关关鸣叫时，意味着春天到了。表现婚姻典礼的《关雎》以候鸟在河洲雌雄和鸣开篇，正与诗篇内容相映成趣，比兴也是有意味的。'
+			);
+```
+
+### 2.3.2 后端API实现
+
+- 给定图片id，返回简略信息，`GET`
+
+  - `input`：
+
+    ```json
+    picture_id
+    ```
+
+  - `output`:
+
+    ```json
+    {
+        title: "xxx",
+        abstract: "xxx" ,
+    	picture_url: "xxx",
+    	pinyin_url: "xxx"
+    }
+    ```
+
+- 给定图片id，返回详细信息（了解更多），`GET`
+
+  - `input`：
+
+    ```json
+    picture_id
+    ```
+
+  - `output`:
+
     ```json
     {
         title: "xxx"
@@ -305,7 +397,7 @@ INSERT INTO question_bank (`type`, `theme`, `description`, `option`, `answer`, `
     }
     ```
 
-- 给定图片utf-8编码的base64编码，==返回识别结果==，`POST`
+- 给定图片utf-8编码的base64编码，==返回识别结果（未完成）==，`POST`
   - `input`：
 
     ```json

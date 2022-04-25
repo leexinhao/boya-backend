@@ -47,3 +47,19 @@ async def get_poemInfo(poem_id: int,
         traceback.print_exc()
         raise HTTPException(status_code=400, detail="客户端运行错误，请检查输入内容或联系管理员！")
     return jsonable_encoder(result)
+
+
+@router.get("/get-like/{keyword}", responses={400: {"model": Code400}})
+async def get_likePoem(keyword: str, limit: Optional[int] = Query(None), skip: int = Query(0)):
+    r"""
+    给定关键词，返回模糊匹配结果
+    """
+    try:
+        result = poem_service.get_likePoem(keyword, limit, skip)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        print(repr(e))
+        traceback.print_exc()
+        raise HTTPException(status_code=400, detail="客户端运行错误，请检查输入内容或联系管理员！")
+    return jsonable_encoder(result)

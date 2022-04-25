@@ -87,7 +87,8 @@ def select_items(table_name: str,
                  columns: Optional[List[str]] = None,
                  where: Optional[Dict[str, Union[str, int, float]]] = None,
                  limit: Optional[int] = None,
-                 skip: int = 0) -> List[Dict[str, Union[str, int, float]]]:
+                 skip: int = 0,
+                 use_like=False) -> List[Dict[str, Union[str, int, float]]]:
     r"""
     单表查询
     Args:
@@ -110,7 +111,7 @@ def select_items(table_name: str,
             col_choice = ",".join(['`'+escape_string(c)+'`' for c in columns])
         else:
             col_choice = "*"
-        where_choice = kv_to_where(where)
+        where_choice = kv_to_where(where, use_like=use_like)
         assert (type(limit) is int and limit >=
                 0) or limit is None, "limit不是非零整数或None!"
         assert type(skip) is int and skip >= 0, "skip不是非零整数!"
@@ -121,6 +122,7 @@ def select_items(table_name: str,
                 """
         if limit is not None:
             sql += f"LIMIT {limit} OFFSET {skip}"
+        print(sql)
         cursor.execute(sql)
         results = cursor.fetchall()
     except Exception as e:
