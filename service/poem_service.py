@@ -56,13 +56,17 @@ def get_likePoem(keyword: str, limit: Optional[int], skip: int) -> Dict[str, Uni
             else:
                 poem_Info['title'] = span(poem_Info['title'])
         if poem_Info['content']is not None:
-            sentences = poem_Info['content'].split('。')
-            del poem_Info['content']
-            poem_Info['abstract'] = span(sentences[0])
-            for s in sentences:
-                s = s.strip()
-                tmp_loc = s.find(keyword)
-                if tmp_loc != -1:
-                    poem_Info['abstract'] = f"{span(s[0:tmp_loc])}{strong(s[tmp_loc:tmp_loc+len(keyword)])}{span(s[tmp_loc+len(keyword):])}"
-                    break
+            left = 0
+            right = 0
+            poem_Info['abstract'] = ""
+            while right < len(poem_Info['content']):
+                if poem_Info['content'][right] in ['。', '?', '？', '.']:
+                    s = poem_Info['content'][left:right+1].strip()
+                    left = right+1
+                    tmp_loc = s.find(keyword)
+                    if tmp_loc != -1:
+                        poem_Info['abstract'] = f"{span(s[0:tmp_loc])}{strong(s[tmp_loc:tmp_loc+len(keyword)])}{span(s[tmp_loc+len(keyword):])}"
+                        break
+                right += 1
+        del poem_Info['content']
     return poem_Infos
