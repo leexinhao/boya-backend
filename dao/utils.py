@@ -66,7 +66,13 @@ def kv_to_where(where: Optional[Dict[str, Union[str, int, float]]], use_like=Fal
                 assert use_like == False
                 where_choice.append(
                     '(`' + escape_string(k) + '`=' + escape_string(str(where[k])) + ')')
-        where_choice = " AND ".join(where_choice)
+        if use_like:
+            where_choice = " OR ".join(where_choice)
+        else:
+            where_choice = " AND ".join(where_choice)
     else:
-        where_choice = "1=1"
+        if use_like:
+            where_choice = "1=0"
+        else:
+            where_choice = "1=1"
     return where_choice

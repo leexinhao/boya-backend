@@ -47,19 +47,22 @@ def get_likePoem(keyword: str, limit: Optional[int], skip: int) -> Dict[str, Uni
 
     poem_Infos = crud.select_items('poem', columns=['poem_id', 'title', 'content'],
     where={'title':keyword, 'content':keyword}, limit=limit, skip=skip, use_like=True)
+    # print(poem_Infos)
     for poem_Info in poem_Infos:
         tmp_loc = poem_Info['title'].find(keyword)
-        if tmp_loc != -1:
-            poem_Info['title'] = f"{span(poem_Info['title'][0:tmp_loc])}{strong(poem_Info['title'][tmp_loc:tmp_loc+len(keyword)])}{span(poem_Info['title'][tmp_loc+len(keyword):])}"
-        else:
-            poem_Info['title'] = span(poem_Info['title'])
-        sentences = poem_Info['content'].split('。')
-        del poem_Info['content']
-        poem_Info['abstract'] = span(sentences[0])
-        for s in sentences:
-            s = s.strip()
-            tmp_loc = s.find(keyword)
+        if poem_Info['title'] is not None:
             if tmp_loc != -1:
-                poem_Info['abstract'] = f"{span(s[0:tmp_loc])}{strong(s[tmp_loc:tmp_loc+len(keyword)])}{span(s[tmp_loc+len(keyword):])}"
-                break
+                poem_Info['title'] = f"{span(poem_Info['title'][0:tmp_loc])}{strong(poem_Info['title'][tmp_loc:tmp_loc+len(keyword)])}{span(poem_Info['title'][tmp_loc+len(keyword):])}"
+            else:
+                poem_Info['title'] = span(poem_Info['title'])
+        if poem_Info['content']is not None:
+            sentences = poem_Info['content'].split('。')
+            del poem_Info['content']
+            poem_Info['abstract'] = span(sentences[0])
+            for s in sentences:
+                s = s.strip()
+                tmp_loc = s.find(keyword)
+                if tmp_loc != -1:
+                    poem_Info['abstract'] = f"{span(s[0:tmp_loc])}{strong(s[tmp_loc:tmp_loc+len(keyword)])}{span(s[tmp_loc+len(keyword):])}"
+                    break
     return poem_Infos
