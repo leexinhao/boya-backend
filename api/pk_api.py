@@ -88,6 +88,7 @@ async def generate_token():
 
 @router.websocket("/ws1/{token}/{openid}")
 async def websocket_endpoint(websocket: WebSocket, token: str, openid: str):
+    another_id=None
     # 1、用户与服务器建立连接
     print("connect",token, openid)
     r = await manager.connect(websocket, token, openid)
@@ -125,10 +126,13 @@ async def websocket_endpoint(websocket: WebSocket, token: str, openid: str):
 
                 ##4、发送题目信息
                 # await manager.broadcast("水",token)
-
+            elif data=='over':
+                another_ws = manager.active_connections[token][another_id]
+                await manager.send_personal_message({"type":5,"data":data},another_ws,"json")
+                                
             # 5、服务器接受客户消息
             ## FIXME 或许是接受json?
-            if data!='1':
+            else:
                 #TODO 6、判断答案是否正确
                 print(data)
                 isright= '水' in data
