@@ -86,7 +86,7 @@ async def generate_token():
     return jsonable_encoder({"token":result})
 
 
-@router.websocket("/ws/{token}/{openid}")
+@router.websocket("/ws1/{token}/{openid}")
 async def websocket_endpoint(websocket: WebSocket, token: str, openid: str):
     # 1、用户与服务器建立连接
     print("connect",token, openid)
@@ -142,4 +142,54 @@ async def websocket_endpoint(websocket: WebSocket, token: str, openid: str):
         # 5、客户断开联系，进行广播
         print("duanle", token, openid)
         manager.disconnect(token, openid)
-        await manager.broadcast(f"{openid} 离开了房间",token)
+        await manager.broadcast({"type":4,"data":f"{openid} 离开了房间"},token,"json")
+
+
+@router.websocket("/ws2/{token}/{openid}")
+async def websocket_endpoint2(websocket: WebSocket, token: str, openid: str):
+    # 1、用户与服务器建立连接
+    print("connect",token, openid)
+    r = await manager.connect(websocket, token, openid)
+    if not r:
+        return
+
+    # TODO 对战实现
+
+    # 2、广播某个用户进入了房间
+    await manager.broadcast(f"{openid} 进入了房间", token)
+    another_id=None
+    try:
+        while True:
+            if len(manager.active_connections[token]) == 2 and (not manager.users_flag[token]):
+                manager.users_flag[token]=True
+                await manager.broadcast("ok",token)
+
+            data = await websocket.receive_text()
+            print("接受信息",data)
+            if str(data)=='0':
+                # TODO 3、返回两个用户的信息
+                user1_info=user_service.get_userInfo(openid)
+                
+                ids = list(manager.active_connections[token].keys())
+                if openid==ids[0]:
+                    another_id=ids[1]
+                else:
+                    another_id=ids[0]
+                
+                user2_info=user_service.get_userInfo(another_id)
+                user_info = {"type":1,\
+                    # "uname":[user1_info["uname"],user2_info['uname']],\
+                    "avator_url":[user1_info["avator_url"],user2_info["avator_url"]]}
+                print('abcd1234')
+                await manager.broadcast(user_info,token,"json")
+
+            # 4、将接收到的消息发送给另外一方
+            if data!='0':
+                another_ws = manager.active_connections[token][another_id]
+                await manager.send_personal_message({"type":2,"data":data},another_ws,"json")
+
+    except WebSocketDisconnect:
+        # 5、客户断开联系，进行广播
+        print("duanle", token, openid)
+        manager.disconnect(token, openid)
+        await manager.broadcast({"type":4,"data":f"{openid} 离开了房间"},token,"json")
